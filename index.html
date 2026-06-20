@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DROP-2LUZ WebAR Buso Coleccionable</title>
+    
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    
+    <style>
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+        }
+        mindar-ui-loading { 
+            background-color: rgba(0, 0, 0, 0.8) !important; 
+        }
+    </style>
+
+    <script>
+        // Componente ECS personalizado para la rotación determinista tipo exhibición
+        AFRAME.registerComponent('auto-rotate', {
+            schema: {
+                speed: { type: 'number', default: 30 }
+            },
+            tick: function (time, timeDelta) {
+                // Se calcula el delta de rotación uniforme independiente del hardware
+                var rotationDelta = (this.data.speed * timeDelta) / 1000;
+                var currentRotation = this.el.getAttribute('rotation');
+                
+                // Aplica el incremento únicamente al eje Y
+                this.el.setAttribute('rotation', {
+                    x: currentRotation.x,
+                    y: currentRotation.y + rotationDelta,
+                    z: currentRotation.z
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    <a-scene 
+        mindar-image="imageTargetSrc: ./targets.mind; filterMinCF: 0.0001; filterBeta: 0.001;" 
+        color-space="sRGB" 
+        renderer="colorManagement: true; physicallyCorrectLights: true;" 
+        vr-mode-ui="enabled: false" 
+        device-orientation-permission-ui="enabled: false">
+        
+        <a-assets>
+            <a-asset-item id="angelModel" src="./Untitled.glb"></a-asset-item>
+        </a-assets>
+
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+        <a-entity mindar-image-target="targetIndex: 0">
+            <a-gltf-model 
+                src="#angelModel" 
+                position="0 0 0" 
+                rotation="0 0 0" 
+                scale="1 1 1" 
+                auto-rotate="speed: 40">
+            </a-gltf-model>
+            
+            <a-light type="directional" intensity="1.5" position="0 1 2"></a-light>
+            <a-light type="ambient" intensity="0.7"></a-light>
+        </a-entity>
+    </a-scene>
+</body>
+</html>
